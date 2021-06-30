@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:animated_text_kit/animated_text_kit.dart';
 class WelcomeScreen extends StatefulWidget {
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
@@ -14,8 +14,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
     super.initState();
     animationController=AnimationController(
       duration: Duration(seconds: 1),
-      vsync: this
+      vsync: this,
+      upperBound: 100.0
     );
+    animationController.forward();
+    animationController.addListener(() {
+      setState(() {
+      });
+      print(animationController.value);
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -33,15 +40,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                   tag: 'logo',
                   child: Container(
                     child: Image.asset('images/logo.png'),
-                    height: 60.0,
+                    height: animationController.value,
                   ),
                 ),
-                Text(
-                  'Flash Chat',
-                  style: TextStyle(
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.w900,
+                WavyAnimatedTextKit(
+                  text: ['Flash Chat'],
+                  textStyle: TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900
                   ),
+                  speed: Duration(seconds: 1),
                 ),
               ],
             ),
