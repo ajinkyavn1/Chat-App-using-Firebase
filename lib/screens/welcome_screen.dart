@@ -5,7 +5,18 @@ class WelcomeScreen extends StatefulWidget {
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin {
+
+  AnimationController animationController;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    animationController=AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,9 +29,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Container(
-                  child: Image.asset('images/logo.png'),
-                  height: 60.0,
+                Hero(
+                  tag: 'logo',
+                  child: Container(
+                    child: Image.asset('images/logo.png'),
+                    height: 60.0,
+                  ),
                 ),
                 Text(
                   'Flash Chat',
@@ -43,6 +57,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: MaterialButton(
                   onPressed: () {
                     //Go to login screen.
+                    Navigator.pushNamed(context, 'login_screen');
                   },
                   minWidth: 200.0,
                   height: 42.0,
@@ -61,6 +76,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: MaterialButton(
                   onPressed: () {
                     //Go to registration screen.
+                    Navigator.pushNamed(context, 'register');
                   },
                   minWidth: 200.0,
                   height: 42.0,
