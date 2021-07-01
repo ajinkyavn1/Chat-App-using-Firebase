@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -6,6 +8,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  var email,pass;
+  final _auth=FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextField(
               onChanged: (value) {
+                email=value;
                 //Do something with the user input.
               },
               decoration: InputDecoration(
@@ -53,7 +58,10 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 8.0,
             ),
             TextField(
+              obscuringCharacter: '*',
+              obscureText: true,
               onChanged: (value) {
+                pass=value;
                 //Do something with the user input.
               },
               decoration: InputDecoration(
@@ -85,8 +93,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(30.0)),
                 elevation: 5.0,
                 child: MaterialButton(
-                  onPressed: () {
-                    //Implement login functionality.
+                  onPressed: ()async {
+
+                    try{
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please Wait...')));
+                      final user=await _auth.signInWithEmailAndPassword(email: email, password: pass);
+                      if(user!=Null)
+                        {
+                          Navigator.pushNamed(context, "chatScreen");
+                        }
+                    }catch(e) {
+                      print(e);
+                      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: e));
+                    }
                   },
                   minWidth: 200.0,
                   height: 42.0,
