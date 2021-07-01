@@ -1,3 +1,5 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
@@ -9,6 +11,8 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth=FirebaseAuth.instance;
+  final _firestore=FirebaseFirestore.instance;
+  String messege;
   User loggedin;
 
   getCurruntUser()async{
@@ -20,10 +24,19 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
   }
+  getMesseges()async{
+    final messeges=await _firestore.collection("Messeges").get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((messeges) {
+        print(messeges.data());
+      });
+    });
+  }
   @override
   void initState() {
     super.initState();
     getCurruntUser();
+    getMesseges();
 
   }
   @override
@@ -35,6 +48,8 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
+                _auth.signOut();
+                Navigator.pop(context);
                 //Implement logout functionality
               }),
         ],
@@ -46,6 +61,21 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder(
+              stream: _firestore.collection("Messeges").snapshots(),
+              builder: (context,shapshot){
+                if(shapshot.hasData) {
+                  final messeges = shapshot.data.documents;
+                    List<Text> messegeWidget = [];
+                    for (var messege in messeges) {
+                      final MessegeText=messege.data['text'];
+                      final Sender=messege.data['sender'];
+                      print(MessegeText);
+                      print(Sender);
+                      }
+                }
+              },
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -54,6 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
+                        messege=value;
                         //Do something with the user input.
                       },
                       decoration: kMessageTextFieldDecoration,
@@ -61,6 +92,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   FlatButton(
                     onPressed: () {
+                      print(messege);
+                      _firestore.collection("Messeges").add({
+                        'text':messege,
+                        'sender':loggedin.email
+                      });
                       //Implement send functionality.
                     },
                     child: Text(
